@@ -24,7 +24,11 @@ import payrollcasestudy.entities.paymentschedule.PaymentSchedule;
 import payrollcasestudy.transactions.Transaction;
 import payrollcasestudy.transactions.add.AddHourlyEmployeeTransaction;
 import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 import spark.Spark;
+import spark.TemplateViewRoute;
 import updatable.Updatable;
 import velocityy.VelocityTemplateEngine;
 import views.EmpleadoView;
@@ -43,9 +47,12 @@ public class Main {
 		employeeId = 0;	
 		
 		
-		get("/regi", (request, response) -> {
-		      return new ModelAndView(new HashMap(), "registrar1.vtl");
-		    }, velocity.vel());
+		get("/regi", new TemplateViewRoute() {
+			@Override
+			public ModelAndView handle(Request request, Response response) throws Exception {
+			      return new ModelAndView(new HashMap(), "registrar1.vtl");
+			    }
+		}, velocity.vel());
 
 		
 		
@@ -53,69 +60,23 @@ public class Main {
         
         
         
-    	post("/registrarEmpleado", (request, response) -> employeeController.createEmployee(request.queryParams("id"), request.queryParams("nombre"), request.queryParams("direccion")));
-    	
-        
+    	post("/registrarEmpleado", new Route() {
+			@Override
+			public Object handle(Request request, Response response) throws Exception {
+				return employeeController.createEmployee(request.queryParams("id"), request.queryParams("nombre"), request.queryParams("direccion"));
+			}
+		});    	     		
+	
 		
-	//	post("/registrar", (request, response) -> registrar_Empleado(request.queryParams("nombre"), request.queryParams("apellido"), request.queryParams("direccion"), Double.parseDouble(request.queryParams("tarifa_por_hora"))));
-	
-		//get("/mostrar2", (request, response) ->showEmployee());
-		
-		
-		get("/mostrar", (request, response) -> {
-			Map<String, Object> map = new HashMap<>();
-            map.put("nombre", employeeController.showEmployee());
-		      return new ModelAndView(map, "showEmp.vtl");
-		    }, velocity.vel());
-	
-		/*Spark.post("/mostrar", (request, response) -> {
-            StringWriter writer = new StringWriter();
- 
-            try {
-                String name = request.queryParams("nombre") != null ? request.queryParams("nombre") : "anonymous";
-                String email = request.queryParams("direccion") != null ? request.queryParams("direccion") : "unknown";
- 
-                Template resultTemplate = configuration.getTemplate("showEmp.ftl");
- 
-                Map<String, Object> map = new HashMap<>();
-                map.put("nombre", name);
-                map.put("direccion", email);
- 
-                resultTemplate.process(map, writer);
-            } catch (Exception e) {
-                Spark.halt(500);
-            }
- 
-            return writer;
-        });
-		*/
-		/*
-		Spark.get("/mostrar3", (request, response) -> {
-            StringWriter writer = new StringWriter();
- 
-            try {
-                //String name = request.queryParams("nombre") != null ? request.queryParams("nombre") : "anonymous";
-               // String email = request.queryParams("direccion") != null ? request.queryParams("direccion") : "unknown";
-                String a= showEmployee();
-                Template resultTemplate = configuration.getTemplate("showEmp.ftl");
- 
-                Map<String, Object> map = new HashMap<>();
-               // map.put("nombre", name);
-                map.put("direccion", a);
- 
-                resultTemplate.process(map, writer);
-            } catch (Exception e) {
-                Spark.halt(500);
-            }
- 
-            return writer;
-        });
-        */
-
-	
-	}
-
-	
+		get("/mostrar", new TemplateViewRoute() {
+			@Override
+			public ModelAndView handle(Request request, Response response) throws Exception {
+				Map<String, Object> map = new HashMap<>();
+			    map.put("nombre", employeeController.showEmployee());
+			      return new ModelAndView(map, "showEmp.vtl");
+			    }
+		}, velocity.vel());				
+	}	
 
 
 	
